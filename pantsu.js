@@ -8,6 +8,12 @@ let rl = readline.createInterface({
 });
 let crypto = require('crypto');
 let fs = require('fs');
+
+if(!fs.existsSync('./config.json')){
+  console.log('Config not found, creating empty config.');
+  fs.writeFileSync('./config.json', '{}', 'utf8');
+}
+
 let config = require('./config.json');
 
 if(config.token == null){
@@ -17,6 +23,7 @@ if(config.token == null){
       config.token = encryptToken(token, passphrase);
       config.tokenHash = crypto.createHash('sha256').update(token).digest('hex');
       fs.writeFileSync('./config.json', JSON.stringify(config), 'utf-8');
+      login(token);
     });
   });
 }
@@ -39,8 +46,6 @@ else{
 // functions
 function encryptToken(token, passphrase){
   // TODO: Implement PBKDF2, but a single SHA256 hash is sufficient for now, since the encrypted token shouldn't be shared anyways
-  // That said, I am very lazy, and I will probably run my bot out of the git directory
-  // So let's hope someone with too much time on their hands doesn't crack my shitty encryption
 
   console.log(`Encrypting ${token} with passphrase ${passphrase}`);
 
