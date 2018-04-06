@@ -8,6 +8,8 @@ const rl = readline.createInterface({
 });
 const crypto = require('crypto');
 const fs = require('fs');
+const util = require('util')
+const request = require('request');
 
 if(!fs.existsSync('./config.json')){
   console.log('Config not found, creating empty config.');
@@ -74,13 +76,61 @@ function login(token){
   client.login(token);
 }
 
+function isURL(str) {
+  var urlRegex = '^(?!mailto:)(?:(?:http|https|ftp)://)(?:\\S+(?::\\S*)?@)?(?:(?:(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[0-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)(?:\\.(?:[a-z\\u00a1-\\uffff0-9]+-?)*[a-z\\u00a1-\\uffff0-9]+)*(?:\\.(?:[a-z\\u00a1-\\uffff]{2,})))|localhost)(?::\\d{2,5})?(?:(/|\\?|#)[^\\s]*)?$';
+  var url = new RegExp(urlRegex, 'i');
+  return str.length < 2083 && url.test(str);
+}
+
 // callbacks
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
 client.on('message', msg => {
-  if (msg.content.includes('pantsu')) {
-    
+  if (msg.content.includes('analyze')) {
+    var url2analyze = msg.content.split(" ")[1];
+    if(url2analyze == null || !isURL(url2analyze)){
+      msg.channel.send("I can't understand that!");
+    }
+    else{
+      msg.channel.send("Analyzing");
+      var options = {
+        uri: 'https://vision.googleapis.com/v1/images:annotate?key=' + config.visionAPIKey,
+        method: 'POST',
+        json: {
+          "requests": [
+            {
+              "image": {
+                "source": {"imageUri": url2analyze}
+              },
+              "features": [
+                {"type": "WEB_DETECTION"},
+                {"type": "SAFE_SEARCH_DETECTION"}
+              ]
+            }
+          ]
+        }
+      };
+      
+      request(options, (error, response, body) => {
+        if (!error && response.statusCode == 200) {
+          //console.log(util.inspect(body, false, null))
+          if(body.responses[0].error != null){
+            msg.channel.send("Sorry, I couldn't understand that. I'm having trouble with discord image links.");
+          }
+          else{
+            let webInfo = body.responses[0].webDetection;
+            msg.channel.send(`This image really reminds me of ${webInfo.webEntities[0].description}, ${webInfo.webEntities[1].description}, and ${webInfo.webEntities[2].description}`);
+            if(webInfo.visuallySimilarImages != null)
+              msg.channel.send(`This image also looks kinda like this one, check it out: ${webInfo.visuallySimilarImages[0].url}`);
+            msg.channel.send(`The chances that this image is slightly lewd are ${body.responses[0].safeSearchAnnotation.racy.toLowerCase().replace('_', ' ')}. The chances that this image is extremely lewd are ${body.responses[0].safeSearchAnnotation.adult.toLowerCase().replace('_', ' ')}.`);
+          }
+        }
+        else{
+          console.log(error);
+        }
+      }); 
+    }
   }
 });
