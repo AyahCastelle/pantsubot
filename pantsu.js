@@ -34,7 +34,6 @@ else{
 
     // Verify the token against the stored hash to ensure password was correct
     if(crypto.createHash('sha256').update(rawToken).digest('hex') == config.tokenHash){
-      console.log(`Logging in with token ${rawToken}`);
       login(rawToken);
     }
     else{
