@@ -1,20 +1,20 @@
 // requires and constants
-let Discord = require('discord.js');
-let client = new Discord.Client();
-let readline = require('readline');
-let rl = readline.createInterface({
+const Discord = require('discord.js');
+const client = new Discord.Client();
+const readline = require('readline');
+const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
 });
-let crypto = require('crypto');
-let fs = require('fs');
+const crypto = require('crypto');
+const fs = require('fs');
 
 if(!fs.existsSync('./config.json')){
   console.log('Config not found, creating empty config.');
   fs.writeFileSync('./config.json', '{}', 'utf8');
 }
 
-let config = require('./config.json');
+const config = require('./config.json');
 
 if(config.token == null){
   rl.question('What is your bot\'s login token? ', (token) => {
@@ -45,11 +45,11 @@ else{
 // functions
 function encryptToken(token, passphrase){
   // TODO: Implement PBKDF2, but a single SHA256 hash is sufficient for now, since the encrypted token shouldn't be shared anyways
-  let plaintext = Buffer.from(token, 'utf8');
-  let digest = crypto.createHash('sha256').update(passphrase).digest();
-  var output = Buffer.alloc(plaintext.length);
+  const plaintext = Buffer.from(token, 'utf8');
+  const digest = crypto.createHash('sha256').update(passphrase).digest();
+  let output = Buffer.alloc(plaintext.length);
 
-  for(var i = 0; i < plaintext.length; i++){
+  for(let i = 0; i < plaintext.length; i++){
     output[i] = digest[i % digest.length] ^ plaintext[i];
   }
 
@@ -59,9 +59,9 @@ function encryptToken(token, passphrase){
 function decryptToken(token, passphrase){
   // The algorithm in this function is identical, but the passphrase needs to be converted from base64 rather than utf8
   // Additionally, the output needs to be in utf8, not base64
-  let plaintext = Buffer.from(token, 'base64');
-  let digest = crypto.createHash('sha256').update(passphrase).digest();
-  var output = Buffer.alloc(plaintext.length);
+  const plaintext = Buffer.from(token, 'base64');
+  const digest = crypto.createHash('sha256').update(passphrase).digest();
+  let output = Buffer.alloc(plaintext.length);
 
   for(var i = 0; i < plaintext.length; i++){
     output[i] = digest[i % digest.length] ^ plaintext[i];
@@ -80,7 +80,7 @@ client.on('ready', () => {
 });
 
 client.on('message', msg => {
-  if (msg.content.contains('pantsu')) {
+  if (msg.content.includes('pantsu')) {
     
   }
 });
