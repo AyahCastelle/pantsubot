@@ -30,7 +30,7 @@ if(config.token == null){
 else{
   rl.question('What is your token password? ', (passphrase) => {
     rl.close();
-    var rawToken = decryptToken(config.token, passphrase);
+    let rawToken = decryptToken(config.token, passphrase);
 
     // Verify the token against the stored hash to ensure password was correct
     if(crypto.createHash('sha256').update(rawToken).digest('hex') == config.tokenHash){
@@ -63,7 +63,7 @@ function decryptToken(token, passphrase){
   const digest = crypto.createHash('sha256').update(passphrase).digest();
   let output = Buffer.alloc(plaintext.length);
 
-  for(var i = 0; i < plaintext.length; i++){
+  for(let i = 0; i < plaintext.length; i++){
     output[i] = digest[i % digest.length] ^ plaintext[i];
   }
 
