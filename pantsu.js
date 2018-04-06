@@ -45,9 +45,6 @@ else{
 // functions
 function encryptToken(token, passphrase){
   // TODO: Implement PBKDF2, but a single SHA256 hash is sufficient for now, since the encrypted token shouldn't be shared anyways
-
-  console.log(`Encrypting ${token} with passphrase ${passphrase}`);
-
   let plaintext = Buffer.from(token, 'utf8');
   let digest = crypto.createHash('sha256').update(passphrase).digest();
   var output = Buffer.alloc(plaintext.length);
@@ -62,9 +59,6 @@ function encryptToken(token, passphrase){
 function decryptToken(token, passphrase){
   // The algorithm in this function is identical, but the passphrase needs to be converted from base64 rather than utf8
   // Additionally, the output needs to be in utf8, not base64
-
-  console.log(`Decrypting ${token} with passphrase ${passphrase}`);
-
   let plaintext = Buffer.from(token, 'base64');
   let digest = crypto.createHash('sha256').update(passphrase).digest();
   var output = Buffer.alloc(plaintext.length);
@@ -86,7 +80,7 @@ client.on('ready', () => {
 });
 
 client.on('message', msg => {
-  if (msg.content === 'ping') {
-    msg.reply('Pong!');
+  if (msg.content.contains('pantsu')) {
+    
   }
 });
