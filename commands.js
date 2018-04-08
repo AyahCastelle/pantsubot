@@ -111,6 +111,26 @@ const CMDS = {
             fetchPorn(args, Discord, "e621", message)
         }
     },
+    "OWL": {
+        "description": "Shows scores from OWL games.",
+        "adminonly": false,
+        "usage": "OWL [date]",
+        "minArgs": "1",
+        "maxArgs": "-1",
+        "action": function (message, args, Discord, client) {
+            message.channel.send("UNFINISHED");
+        }
+    },
+    "RR": {
+        "description": "Start Russian Roulet with another player.",
+        "adminonly": false,
+        "usage": "RR [Second Player's Username]",
+        "minArgs": "1",
+        "maxArgs": "-1",
+        "action": function (message, args, Discord, client) {
+            message.channel.send("UNFINISHED");
+        }
+    },
     "help": {
         "description": "Get help on commands or list all commands",
         "adminonly": false,
